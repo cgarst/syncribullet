@@ -13,8 +13,8 @@ import type { MDBListMCIT } from './types/manifest';
 
 export const receiverInfo: ReceiverInfo<Receivers.MDBLIST> = {
   id: Receivers.MDBLIST,
-  icon: 'https://api.iconify.design/simple-icons:imdb.svg?color=%23F5C518',
-  text: 'MDBList',
+  icon: 'https://api.iconify.design/simple-icons:mdblist.svg?color=%23FFFFFF',
+  text: 'mdblist',
   backgroundColour: 'bg-[#1A1A1A]/60',
   borderColour: 'border-[#1A1A1A]',
   liveSync: true,
