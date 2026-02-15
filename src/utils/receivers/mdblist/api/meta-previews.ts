@@ -99,7 +99,7 @@ export async function getMDBListMetaPreviews(
     let responseTransform: (data: any) => MDBListLibrary;
 
     switch (status) {
-      case MDBListCatalogStatus.PLANTOWATCH:
+      case MDBListCatalogStatus.WATCHLIST:
         // Watchlist endpoint with metadata enrichment
         url = `https://api.mdblist.com/watchlist/items?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,poster,description,ratings`;
         responseTransform = (data) => ({
@@ -114,7 +114,7 @@ export async function getMDBListMetaPreviews(
         });
         break;
 
-      case MDBListCatalogStatus.COMPLETED:
+      case MDBListCatalogStatus.HISTORY:
         // Watched history endpoint with metadata enrichment
         url = `https://api.mdblist.com/sync/watched?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,ratings`;
         responseTransform = (data) => ({
