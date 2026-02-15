@@ -159,33 +159,6 @@ export async function getMDBListMetaPreviews(
         });
         break;
 
-      case MDBListCatalogStatus.WATCHING:
-        // For "watching" status, we use watched endpoint and filter for shows
-        url = `https://api.mdblist.com/sync/watched?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,ratings`;
-        responseTransform = (data) => ({
-          movies: [],
-          shows: (data.shows || []).map((item: MDBListWatchedItem) => ({
-            id: 0,
-            adult: 0,
-            title: item.show?.title || '',
-            imdb_id: item.show?.ids.imdb || '',
-            tvdb_id: item.show?.ids.tvdb || null,
-            language: 'en',
-            mediatype: 'show' as const,
-            release_year: item.show?.year || 0,
-            watchlist_at: item.last_watched_at,
-            spoken_language: 'en',
-            country: 'us',
-            rank: 0,
-            // Preserve enriched metadata
-            poster: (item.show as any)?.poster,
-            description: (item.show as any)?.description,
-            genres: (item.show as any)?.genres,
-            ratings: (item.show as any)?.ratings,
-          })),
-        });
-        break;
-
       case MDBListCatalogStatus.DROPPED:
         // Dropped shows endpoint with metadata enrichment
         url = `https://api.mdblist.com/sync/dropped?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,ratings`;

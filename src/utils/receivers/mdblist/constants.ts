@@ -40,7 +40,7 @@ export const manifestCatalogItems = [
   {
     id: 'syncribullet-mdblist-movies-plantowatch',
     type: ManifestReceiverTypes.MOVIE,
-    name: 'MDBList - Plan to Watch',
+    name: 'MDBList - Watchlist',
     extra: [
       { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
       { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
@@ -49,16 +49,7 @@ export const manifestCatalogItems = [
   {
     id: 'syncribullet-mdblist-movies-completed',
     type: ManifestReceiverTypes.MOVIE,
-    name: 'MDBList - Completed',
-    extra: [
-      { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
-      { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
-    ],
-  },
-  {
-    id: 'syncribullet-mdblist-shows-watching',
-    type: ManifestReceiverTypes.SERIES,
-    name: 'MDBList - Watching',
+    name: 'MDBList - Watched',
     extra: [
       { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
       { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
@@ -67,7 +58,7 @@ export const manifestCatalogItems = [
   {
     id: 'syncribullet-mdblist-shows-plantowatch',
     type: ManifestReceiverTypes.SERIES,
-    name: 'MDBList - Plan to Watch',
+    name: 'MDBList - Watchlist',
     extra: [
       { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
       { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
@@ -76,7 +67,7 @@ export const manifestCatalogItems = [
   {
     id: 'syncribullet-mdblist-shows-completed',
     type: ManifestReceiverTypes.SERIES,
-    name: 'MDBList - Completed',
+    name: 'MDBList - Watched',
     extra: [
       { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
       { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
@@ -98,7 +89,6 @@ export const defaultCatalogs: Readonly<
 > = [
   'syncribullet-mdblist-movies-plantowatch',
   'syncribullet-mdblist-movies-completed',
-  'syncribullet-mdblist-shows-watching',
   'syncribullet-mdblist-shows-plantowatch',
   'syncribullet-mdblist-shows-completed',
 ] as const satisfies Readonly<(typeof manifestCatalogItems)[number]['id'][]>;
@@ -142,24 +132,6 @@ export const defaultImportCatalogs: Readonly<
         seriesUseCinemetaComparison: null,
         seriesBackfillEpisodes: null,
         supportsTypes: [ManifestReceiverTypes.MOVIE],
-      },
-    },
-    {
-      id: 'syncribullet-mdblist-shows-watching',
-      value: true,
-      filters: {
-        moviesStateFlaggedWatched: null,
-        moviesStateFlaggedUnwatched: null,
-        moviesStateFlaggedDropped: null,
-        seriesStateFlaggedWatched: false,
-        seriesStateFlaggedUnwatched: true,
-        seriesStateFlaggedDropped: false,
-        seriesStateFlaggedOnHold: false,
-        seriesStateHasWatchCount: true,
-        seriesPreferStateFlaggedWatchedOverWatchCount: true,
-        seriesUseCinemetaComparison: true,
-        seriesBackfillEpisodes: true,
-        supportsTypes: [ManifestReceiverTypes.SERIES],
       },
     },
     {
