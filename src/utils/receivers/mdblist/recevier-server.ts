@@ -1,10 +1,14 @@
 import type { PickByArrays, RequireAtLeastOne, Year } from '~/utils/helpers/types';
 import { ManifestReceiverTypes } from '~/utils/manifest';
 import { ReceiverServer } from '~/utils/receiver/receiver-server';
-import type { IDs } from '~/utils/receiver/types/id';
+import type { IDSources, IDs } from '~/utils/receiver/types/id';
+import { createIDCatalogString } from '~/utils/receiver/types/id';
 import type { ManifestCatalogExtraParametersOptions } from '~/utils/receiver/types/manifest-types';
+import type { MetaObject } from '~/utils/receiver/types/meta-object';
 import type { MetaPreviewObject } from '~/utils/receiver/types/meta-preview-object';
 
+import { CinemetaServerReceiver } from '../cinemeta/receiver-server';
+import { CinemetaCatalogType } from '../cinemeta/types/catalog/catalog-type';
 import type { MDBListLibrary } from './api/meta-previews';
 import { getMDBListMetaPreviews } from './api/meta-previews';
 import { syncMDBListMetaObject } from './api/sync';
@@ -38,10 +42,12 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
   liveSyncTypes = liveSyncTypes;
   defaultLiveSyncTypes = defaultLiveSyncTypes;
 
+  cinemetaServerReceiver: CinemetaServerReceiver;
   HAS_INTERNAL_SKIP = false;
 
   constructor() {
     super();
+    this.cinemetaServerReceiver = new CinemetaServerReceiver();
   }
 
   async getMappingIds(
@@ -54,55 +60,129 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
 
   async _convertPreviewObjectToMetaPreviewObject(
     previewObject: MDBListLibrary['movies'][number] | MDBListLibrary['shows'][number],
-    _oldType: MDBListMCIT['receiverCatalogType'],
+    oldType: MDBListMCIT['receiverCatalogType'],
     _options?: ManifestCatalogExtraParametersOptions,
     _index?: number,
   ): Promise<MetaPreviewObject> {
-    const isMovie = previewObject.mediatype === 'movie';
-    const type: ManifestReceiverTypes = isMovie
-      ? ManifestReceiverTypes.MOVIE
-      : ManifestReceiverTypes.SERIES;
-
-    // Build the ID string from available IDs
-    const idParts: string[] = [];
-    if (previewObject.imdb_id) {
-      idParts.push(`imdb:${previewObject.imdb_id}`);
-    }
-    if (previewObject.tvdb_id) {
-      idParts.push(`tvdb:${previewObject.tvdb_id}`);
-    }
-
-    const id = idParts.length > 0 ? idParts.join(':') : `mdblist:${previewObject.id}`;
-
-    // Format release year as 4-digit string or undefined
-    const releaseInfo = previewObject.release_year
-      ? (previewObject.release_year.toString().padStart(4, '0') as Year)
-      : undefined;
-
-    // Extract IMDB rating from ratings array
-    const imdbRating = previewObject.ratings?.find(
-      (r) => r.source === 'imdb',
-    )?.value?.toFixed(1);
+    const meta = await this._convertObjectToMetaObject(
+      previewObject,
+      undefined,
+      oldType,
+      this.receiverTypeMapping[oldType],
+    );
 
     return {
-      id,
-      type,
-      name: previewObject.title,
-      poster: previewObject.poster || '',
-      releaseInfo,
-      description: previewObject.description,
-      genres: previewObject.genres,
-      imdbRating,
+      id: meta.id,
+      type: meta.type,
+      releaseInfo: meta.releaseInfo as Year,
+      name: meta.name,
+      logo: meta.logo,
+      background: meta.background,
+      poster: meta.poster,
+      posterShape: meta.posterShape,
+      imdbRating: meta.imdbRating,
+      links: meta.links,
+      genres: meta.genres,
+      description: meta.description,
+      trailers: meta.trailers,
     };
   }
 
   async _convertObjectToMetaObject(
-    _object: any,
-    _ids: PickByArrays<IDs, MDBListMCIT['internalIds']>,
-    _type: MDBListMCIT['receiverCatalogType'],
-    _potentialTypes: ManifestReceiverTypes,
-  ): Promise<any> {
-    throw new Error('Method not implemented.');
+    object: MDBListLibrary['movies'][number] | MDBListLibrary['shows'][number],
+    _oldIds:
+      | PickByArrays<IDs, MDBListMCIT['internalIds']>
+      | undefined,
+    _oldType: MDBListMCIT['receiverCatalogType'],
+    potentialType: ManifestReceiverTypes,
+  ): Promise<MetaObject> {
+    const isMovie = object.mediatype === 'movie';
+    const type: ManifestReceiverTypes = isMovie
+      ? ManifestReceiverTypes.MOVIE
+      : ManifestReceiverTypes.SERIES;
+
+    const cinemetaCatalogType = isMovie
+      ? CinemetaCatalogType.MOVIE
+      : CinemetaCatalogType.SERIES;
+
+    // Build IDs object from MDBList data
+    const newIds: Partial<IDs> = {};
+    if (object.imdb_id) {
+      newIds.imdb = object.imdb_id;
+    }
+    if (object.tvdb_id) {
+      newIds.tvdb = object.tvdb_id;
+    }
+
+    const id = createIDCatalogString(newIds);
+    if (!id) {
+      throw new Error('No ID found!');
+    }
+
+    // Format release year
+    const releaseInfo = object.release_year
+      ? (object.release_year.toString().padStart(4, '0') as Year)
+      : undefined;
+
+    // Extract IMDB rating from ratings array if available
+    const imdbRating = object.ratings?.find(
+      (r) => r.source === 'imdb',
+    )?.value?.toFixed(1);
+
+    // Create partial meta with MDBList data
+    const partialMeta = {
+      id,
+      name: object.title,
+      type,
+      releaseInfo,
+      poster: object.poster || undefined,
+      description: object.description,
+      genres: object.genres,
+      imdbRating,
+    } satisfies Partial<MetaObject> as MetaObject;
+
+    let meta: MetaObject = partialMeta;
+
+    // Enrich with Cinemeta data if we have IMDB or TVDB ID
+    if (newIds.imdb || newIds.tvdb) {
+      let response;
+      try {
+        const usableIds = newIds as RequireAtLeastOne<IDs> &
+          Pick<IDs, IDSources.IMDB>;
+        response = await this.cinemetaServerReceiver.getMetaObject(
+          usableIds,
+          cinemetaCatalogType,
+          potentialType,
+        );
+      } catch (e) {
+        if (e instanceof Error && e.message.includes('Not found')) {
+          // Cinemeta doesn't have this content, use MDBList data only
+        } else if (e instanceof Error && e.message.includes('meta object')) {
+          console.error(e.message);
+        } else {
+          // console.error(e);
+        }
+      }
+
+      if (response) {
+        meta = {
+          ...(meta as any),
+          ...response,
+          // Preserve MDBList-specific fields if they exist
+          description: meta.description
+            ? meta.description + '\n' + (response.description ?? '')
+            : response.description,
+          genres: [...(meta.genres ?? []), ...(response.genres ?? [])],
+          imdbRating: meta.imdbRating || response.imdbRating,
+        };
+      }
+    }
+
+    if (!meta) {
+      throw new Error('No meta found!');
+    }
+
+    return meta;
   }
 
   async _getMetaPreviews(
