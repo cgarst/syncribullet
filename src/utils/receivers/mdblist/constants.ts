@@ -9,6 +9,7 @@ import { IDSources } from '~/utils/receiver/types/id';
 import { Receivers } from '~/utils/receiver/types/receivers';
 
 import { MDBListCatalogType } from './types/catalog/catalog-type';
+import type { MDBListMCIT } from './types/manifest';
 
 export const receiverInfo: ReceiverInfo<Receivers.MDBLIST> = {
   id: Receivers.MDBLIST,
