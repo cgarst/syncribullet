@@ -79,12 +79,20 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
       ? (previewObject.release_year.toString().padStart(4, '0') as Year)
       : undefined;
 
+    // Extract IMDB rating from ratings array
+    const imdbRating = previewObject.ratings?.find(
+      (r) => r.source === 'imdb',
+    )?.value?.toFixed(1);
+
     return {
       id,
       type,
       name: previewObject.title,
-      poster: '',
+      poster: previewObject.poster || '',
       releaseInfo,
+      description: previewObject.description,
+      genres: previewObject.genres,
+      imdbRating,
     };
   }
 
