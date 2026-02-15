@@ -93,102 +93,12 @@ export const defaultCatalogs: Readonly<
   'syncribullet-mdblist-shows-history',
 ] as const satisfies Readonly<(typeof manifestCatalogItems)[number]['id'][]>;
 
+// Import sync is disabled (importSync: false), so no import catalog mappings needed
 export const defaultImportCatalogs: Readonly<
   Record<Importers, Readonly<ImportCatalogs<MDBListMCIT, ImporterMCITypes>[]>>
 > = {
   simkl: [],
-  stremio: [
-    {
-      id: 'syncribullet-mdblist-movies-watchlist',
-      value: true,
-      filters: {
-        moviesStateFlaggedWatched: false,
-        moviesStateFlaggedUnwatched: true,
-        moviesStateFlaggedDropped: false,
-        seriesStateFlaggedWatched: null,
-        seriesStateFlaggedUnwatched: null,
-        seriesStateFlaggedDropped: null,
-        seriesStateFlaggedOnHold: null,
-        seriesPreferStateFlaggedWatchedOverWatchCount: null,
-        seriesUseCinemetaComparison: null,
-        seriesStateHasWatchCount: null,
-        seriesBackfillEpisodes: null,
-        supportsTypes: [ManifestReceiverTypes.MOVIE],
-      },
-    },
-    {
-      id: 'syncribullet-mdblist-movies-history',
-      value: true,
-      filters: {
-        moviesStateFlaggedWatched: true,
-        moviesStateFlaggedUnwatched: false,
-        moviesStateFlaggedDropped: false,
-        seriesStateFlaggedWatched: null,
-        seriesStateFlaggedUnwatched: null,
-        seriesStateFlaggedDropped: null,
-        seriesStateFlaggedOnHold: null,
-        seriesPreferStateFlaggedWatchedOverWatchCount: null,
-        seriesStateHasWatchCount: null,
-        seriesUseCinemetaComparison: null,
-        seriesBackfillEpisodes: null,
-        supportsTypes: [ManifestReceiverTypes.MOVIE],
-      },
-    },
-    {
-      id: 'syncribullet-mdblist-shows-watchlist',
-      value: true,
-      filters: {
-        moviesStateFlaggedWatched: null,
-        moviesStateFlaggedUnwatched: null,
-        moviesStateFlaggedDropped: null,
-        seriesStateFlaggedWatched: false,
-        seriesStateFlaggedUnwatched: true,
-        seriesStateFlaggedDropped: false,
-        seriesStateFlaggedOnHold: false,
-        seriesStateHasWatchCount: false,
-        seriesPreferStateFlaggedWatchedOverWatchCount: true,
-        seriesUseCinemetaComparison: false,
-        seriesBackfillEpisodes: false,
-        supportsTypes: [ManifestReceiverTypes.SERIES],
-      },
-    },
-    {
-      id: 'syncribullet-mdblist-shows-history',
-      value: true,
-      filters: {
-        moviesStateFlaggedWatched: null,
-        moviesStateFlaggedUnwatched: null,
-        moviesStateFlaggedDropped: null,
-        seriesStateFlaggedWatched: true,
-        seriesStateFlaggedUnwatched: false,
-        seriesStateFlaggedDropped: false,
-        seriesStateFlaggedOnHold: false,
-        seriesStateHasWatchCount: null,
-        seriesPreferStateFlaggedWatchedOverWatchCount: true,
-        seriesUseCinemetaComparison: false,
-        seriesBackfillEpisodes: true,
-        supportsTypes: [ManifestReceiverTypes.SERIES],
-      },
-    },
-    {
-      id: 'syncribullet-mdblist-shows-dropped',
-      value: true,
-      filters: {
-        moviesStateFlaggedWatched: null,
-        moviesStateFlaggedUnwatched: null,
-        moviesStateFlaggedDropped: null,
-        seriesStateFlaggedWatched: false,
-        seriesStateFlaggedUnwatched: true,
-        seriesStateFlaggedDropped: true,
-        seriesStateFlaggedOnHold: false,
-        seriesStateHasWatchCount: true,
-        seriesPreferStateFlaggedWatchedOverWatchCount: true,
-        seriesUseCinemetaComparison: true,
-        seriesBackfillEpisodes: true,
-        supportsTypes: [ManifestReceiverTypes.SERIES],
-      },
-    },
-  ],
+  stremio: [],
 } as const satisfies Readonly<
   Record<Importers, Readonly<ImportCatalogs<MDBListMCIT, ImporterMCITypes>[]>>
 >;

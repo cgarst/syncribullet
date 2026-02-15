@@ -1,5 +1,5 @@
 import { $, component$, useSignal } from '@builder.io/qwik';
-import { Link, useNavigate } from '@builder.io/qwik-city';
+import { Link } from '@builder.io/qwik-city';
 
 import { useForm } from '@modular-forms/qwik';
 import type { SubmitHandler } from '@modular-forms/qwik';
@@ -11,13 +11,11 @@ export type ApiKeyForm = {
 };
 
 export default component$(() => {
-  const nav = useNavigate();
-
   const [, { Form, Field }] = useForm<ApiKeyForm>({
     loader: useSignal({ apikey: '' }),
   });
 
-  const handleSubmit = $<SubmitHandler<ApiKeyForm>>(async (values) => {
+  const handleSubmit = $<SubmitHandler<ApiKeyForm>>((values) => {
     if (!values.apikey) {
       return;
     }
@@ -28,8 +26,6 @@ export default component$(() => {
         apikey: values.apikey,
       },
     });
-
-    await nav(`/oauth/mdblist/`);
   });
 
   return (
