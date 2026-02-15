@@ -38,7 +38,7 @@ export const syncIds = [
 
 export const manifestCatalogItems = [
   {
-    id: 'syncribullet-mdblist-movies-plantowatch',
+    id: 'syncribullet-mdblist-movies-watchlist',
     type: ManifestReceiverTypes.MOVIE,
     name: 'MDBList - Watchlist',
     extra: [
@@ -47,16 +47,16 @@ export const manifestCatalogItems = [
     ],
   },
   {
-    id: 'syncribullet-mdblist-movies-completed',
+    id: 'syncribullet-mdblist-movies-history',
     type: ManifestReceiverTypes.MOVIE,
-    name: 'MDBList - Watched',
+    name: 'MDBList - History',
     extra: [
       { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
       { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
     ],
   },
   {
-    id: 'syncribullet-mdblist-shows-plantowatch',
+    id: 'syncribullet-mdblist-shows-watchlist',
     type: ManifestReceiverTypes.SERIES,
     name: 'MDBList - Watchlist',
     extra: [
@@ -65,9 +65,9 @@ export const manifestCatalogItems = [
     ],
   },
   {
-    id: 'syncribullet-mdblist-shows-completed',
+    id: 'syncribullet-mdblist-shows-history',
     type: ManifestReceiverTypes.SERIES,
-    name: 'MDBList - Watched',
+    name: 'MDBList - History',
     extra: [
       { name: ManifestCatalogExtraParameters.GENRE, isRequired: false },
       { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
@@ -87,10 +87,10 @@ export const manifestCatalogItems = [
 export const defaultCatalogs: Readonly<
   (typeof manifestCatalogItems)[number]['id'][]
 > = [
-  'syncribullet-mdblist-movies-plantowatch',
-  'syncribullet-mdblist-movies-completed',
-  'syncribullet-mdblist-shows-plantowatch',
-  'syncribullet-mdblist-shows-completed',
+  'syncribullet-mdblist-movies-watchlist',
+  'syncribullet-mdblist-movies-history',
+  'syncribullet-mdblist-shows-watchlist',
+  'syncribullet-mdblist-shows-history',
 ] as const satisfies Readonly<(typeof manifestCatalogItems)[number]['id'][]>;
 
 export const defaultImportCatalogs: Readonly<
@@ -99,7 +99,7 @@ export const defaultImportCatalogs: Readonly<
   simkl: [],
   stremio: [
     {
-      id: 'syncribullet-mdblist-movies-plantowatch',
+      id: 'syncribullet-mdblist-movies-watchlist',
       value: true,
       filters: {
         moviesStateFlaggedWatched: false,
@@ -117,7 +117,7 @@ export const defaultImportCatalogs: Readonly<
       },
     },
     {
-      id: 'syncribullet-mdblist-movies-completed',
+      id: 'syncribullet-mdblist-movies-history',
       value: true,
       filters: {
         moviesStateFlaggedWatched: true,
@@ -135,7 +135,7 @@ export const defaultImportCatalogs: Readonly<
       },
     },
     {
-      id: 'syncribullet-mdblist-shows-plantowatch',
+      id: 'syncribullet-mdblist-shows-watchlist',
       value: true,
       filters: {
         moviesStateFlaggedWatched: null,
@@ -153,7 +153,7 @@ export const defaultImportCatalogs: Readonly<
       },
     },
     {
-      id: 'syncribullet-mdblist-shows-completed',
+      id: 'syncribullet-mdblist-shows-history',
       value: true,
       filters: {
         moviesStateFlaggedWatched: null,
