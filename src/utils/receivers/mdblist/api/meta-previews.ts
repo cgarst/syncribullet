@@ -1,8 +1,6 @@
 import { axiosCache } from '~/utils/axios/cache';
 
-import type { MDBListCatalogStatus } from '../types/catalog/catalog-status';
 import { MDBListCatalogStatus } from '../types/catalog/catalog-status';
-import type { MDBListCatalogType } from '../types/catalog/catalog-type';
 import { MDBListCatalogType } from '../types/catalog/catalog-type';
 import type { MDBListUserSettings } from '../types/user-settings';
 

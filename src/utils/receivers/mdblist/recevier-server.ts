@@ -1,5 +1,5 @@
-import type { PickByArrays, RequireAtLeastOne } from '~/utils/helpers/types';
-import type { ManifestReceiverTypes } from '~/utils/manifest';
+import type { PickByArrays, RequireAtLeastOne, Year } from '~/utils/helpers/types';
+import { ManifestReceiverTypes } from '~/utils/manifest';
 import { ReceiverServer } from '~/utils/receiver/receiver-server';
 import type { IDs } from '~/utils/receiver/types/id';
 import type { ManifestCatalogExtraParametersOptions } from '~/utils/receiver/types/manifest-types';
@@ -59,7 +59,9 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
     _index?: number,
   ): Promise<MetaPreviewObject> {
     const isMovie = previewObject.mediatype === 'movie';
-    const type = isMovie ? 'movie' : 'series';
+    const type: ManifestReceiverTypes = isMovie
+      ? ManifestReceiverTypes.MOVIE
+      : ManifestReceiverTypes.SERIES;
 
     // Build the ID string from available IDs
     const idParts: string[] = [];
@@ -72,13 +74,17 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
 
     const id = idParts.length > 0 ? idParts.join(':') : `mdblist:${previewObject.id}`;
 
+    // Format release year as 4-digit string or undefined
+    const releaseInfo = previewObject.release_year
+      ? (previewObject.release_year.toString().padStart(4, '0') as Year)
+      : undefined;
+
     return {
       id,
       type,
       name: previewObject.title,
-      releaseInfo: previewObject.release_year?.toString(),
-      poster: undefined, // MDBList doesn't provide poster in basic response
-      description: undefined,
+      poster: '',
+      releaseInfo,
     };
   }
 
