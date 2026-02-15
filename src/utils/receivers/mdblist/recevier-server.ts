@@ -5,6 +5,8 @@ import type { IDs } from '~/utils/receiver/types/id';
 import type { ManifestCatalogExtraParametersOptions } from '~/utils/receiver/types/manifest-types';
 import type { MetaPreviewObject } from '~/utils/receiver/types/meta-preview-object';
 
+import type { MDBListLibrary } from './api/meta-previews';
+import { getMDBListMetaPreviews } from './api/meta-previews';
 import { syncMDBListMetaObject } from './api/sync';
 import {
   defaultCatalogs,
@@ -51,12 +53,33 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
   }
 
   async _convertPreviewObjectToMetaPreviewObject(
-    _previewObject: any,
+    previewObject: MDBListLibrary['movies'][number] | MDBListLibrary['shows'][number],
     _oldType: MDBListMCIT['receiverCatalogType'],
     _options?: ManifestCatalogExtraParametersOptions,
     _index?: number,
   ): Promise<MetaPreviewObject> {
-    throw new Error('Method not implemented.');
+    const isMovie = previewObject.mediatype === 'movie';
+    const type = isMovie ? 'movie' : 'series';
+
+    // Build the ID string from available IDs
+    const idParts: string[] = [];
+    if (previewObject.imdb_id) {
+      idParts.push(`imdb:${previewObject.imdb_id}`);
+    }
+    if (previewObject.tvdb_id) {
+      idParts.push(`tvdb:${previewObject.tvdb_id}`);
+    }
+
+    const id = idParts.length > 0 ? idParts.join(':') : `mdblist:${previewObject.id}`;
+
+    return {
+      id,
+      type,
+      name: previewObject.title,
+      releaseInfo: previewObject.release_year?.toString(),
+      poster: undefined, // MDBList doesn't provide poster in basic response
+      description: undefined,
+    };
   }
 
   async _convertObjectToMetaObject(
@@ -69,13 +92,28 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
   }
 
   async _getMetaPreviews(
-    _type: MDBListCatalogType,
+    type: MDBListCatalogType,
     _potentialTypes: MDBListCatalogType[],
-    _status: MDBListCatalogStatus,
+    status: MDBListCatalogStatus,
     _options?: ManifestCatalogExtraParametersOptions,
   ): Promise<any[]> {
-    // MDBList doesn't have catalog support in this implementation
-    return [];
+    const previews = await getMDBListMetaPreviews(
+      type,
+      status,
+      this.userSettings,
+    );
+
+    // Combine movies and shows, sort by date
+    const combined = [
+      ...(previews.movies ?? []),
+      ...(previews.shows ?? []),
+    ].sort((a, b) => {
+      const dateA = a.watchlist_at || '';
+      const dateB = b.watchlist_at || '';
+      return dateB.localeCompare(dateA);
+    });
+
+    return combined;
   }
 
   _getMetaObject(
