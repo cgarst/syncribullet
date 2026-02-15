@@ -116,7 +116,7 @@ export async function getMDBListMetaPreviews(
 
       case MDBListCatalogStatus.COMPLETED:
         // Watched history endpoint with metadata enrichment
-        url = `https://api.mdblist.com/sync/watched?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,poster,description,ratings`;
+        url = `https://api.mdblist.com/sync/watched?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,ratings`;
         responseTransform = (data) => ({
           movies: (data.movies || []).map((item: MDBListWatchedItem) => ({
             id: 0,
@@ -161,7 +161,7 @@ export async function getMDBListMetaPreviews(
 
       case MDBListCatalogStatus.WATCHING:
         // For "watching" status, we use watched endpoint and filter for shows
-        url = `https://api.mdblist.com/sync/watched?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,poster,description,ratings`;
+        url = `https://api.mdblist.com/sync/watched?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,ratings`;
         responseTransform = (data) => ({
           movies: [],
           shows: (data.shows || []).map((item: MDBListWatchedItem) => ({
@@ -188,7 +188,7 @@ export async function getMDBListMetaPreviews(
 
       case MDBListCatalogStatus.DROPPED:
         // Dropped shows endpoint with metadata enrichment
-        url = `https://api.mdblist.com/sync/dropped?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,poster,description,ratings`;
+        url = `https://api.mdblist.com/sync/dropped?apikey=${userConfig.auth.apikey}&limit=100&append_to_response=genres,ratings`;
         responseTransform = (data) => ({
           movies: [],
           shows: (data.shows || []).map((item: MDBListDroppedItem) => ({
