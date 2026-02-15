@@ -131,6 +131,11 @@ export async function getMDBListMetaPreviews(
             spoken_language: 'en',
             country: 'us',
             rank: 0,
+            // Preserve enriched metadata
+            poster: (item.movie as any)?.poster,
+            description: (item.movie as any)?.description,
+            genres: (item.movie as any)?.genres,
+            ratings: (item.movie as any)?.ratings,
           })),
           shows: (data.shows || []).map((item: MDBListWatchedItem) => ({
             id: 0,
@@ -145,6 +150,11 @@ export async function getMDBListMetaPreviews(
             spoken_language: 'en',
             country: 'us',
             rank: 0,
+            // Preserve enriched metadata
+            poster: (item.show as any)?.poster,
+            description: (item.show as any)?.description,
+            genres: (item.show as any)?.genres,
+            ratings: (item.show as any)?.ratings,
           })),
         });
         break;
@@ -167,6 +177,11 @@ export async function getMDBListMetaPreviews(
             spoken_language: 'en',
             country: 'us',
             rank: 0,
+            // Preserve enriched metadata
+            poster: (item.show as any)?.poster,
+            description: (item.show as any)?.description,
+            genres: (item.show as any)?.genres,
+            ratings: (item.show as any)?.ratings,
           })),
         });
         break;
@@ -189,6 +204,11 @@ export async function getMDBListMetaPreviews(
             spoken_language: 'en',
             country: 'us',
             rank: 0,
+            // Preserve enriched metadata
+            poster: (item.show as any)?.poster,
+            description: (item.show as any)?.description,
+            genres: (item.show as any)?.genres,
+            ratings: (item.show as any)?.ratings,
           })),
         });
         break;
