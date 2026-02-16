@@ -222,6 +222,7 @@ export async function getMDBListMetaPreviews(
 
       case MDBListCatalogStatus.UPNEXT:
         // Up Next endpoint - in-progress shows with next unwatched episodes
+        // Note: This endpoint only returns TMDB and MDBList IDs (no IMDB IDs)
         url = `https://api.mdblist.com/upnext?apikey=${userConfig.auth.apikey}&limit=100`;
         responseTransform = (data) => ({
           movies: [],

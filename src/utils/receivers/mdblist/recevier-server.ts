@@ -148,8 +148,8 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
 
     let meta: MetaObject = partialMeta;
 
-    // Enrich with Cinemeta data if we have IMDB or TVDB ID
-    if (newIds.imdb || newIds.tvdb) {
+    // Enrich with Cinemeta data only if we have IMDB ID (Cinemeta requirement)
+    if (newIds.imdb) {
       let response;
       try {
         const usableIds = newIds as RequireAtLeastOne<IDs> &
@@ -182,6 +182,7 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
         };
       }
     }
+    // Note: TMDB-only items (like Up Next) will use MDBList data without Cinemeta enrichment
 
     if (!meta) {
       throw new Error('No meta found!');
