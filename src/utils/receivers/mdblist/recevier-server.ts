@@ -113,6 +113,11 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
     if (object.tvdb_id) {
       newIds.tvdb = object.tvdb_id;
     }
+    if ('tmdb_id' in object && object.tmdb_id) {
+      newIds.tmdb = object.tmdb_id;
+    }
+    // Note: mdblist_id is a string in API but IDs type expects number, so we skip it
+    // TMDB should be sufficient for most lookups
 
     const id = createIDCatalogString(newIds);
     if (!id) {

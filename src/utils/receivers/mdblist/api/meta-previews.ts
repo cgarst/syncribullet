@@ -10,6 +10,8 @@ interface MDBListWatchlistItem {
   title: string;
   imdb_id: string;
   tvdb_id: number | null;
+  tmdb_id?: number;
+  mdblist_id?: string;
   language: string;
   mediatype: 'movie' | 'show';
   release_year: number;
@@ -229,6 +231,8 @@ export async function getMDBListMetaPreviews(
             title: item.show.title,
             imdb_id: item.show.ids.imdb || '',
             tvdb_id: item.show.ids.tvdb || null,
+            tmdb_id: item.show.ids.tmdb,
+            mdblist_id: item.show.ids.mdblist,
             language: 'en',
             mediatype: 'show' as const,
             release_year: item.show.year,
