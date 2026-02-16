@@ -277,11 +277,7 @@ export default component$<ConfigureProps>(({ config }) => {
               const link = `stremio://${location.url.host.replace(
                 'localhost',
                 '127.0.0.1',
-              )}${
-                location.url.host.endsWith('syncribullet')
-                  ? '.baby-beamup.club'
-                  : ''
-              }/${encodeURIComponent(url)}/manifest.json`;
+              )}/${encodeURIComponent(url)}/manifest.json`;
 
               console.log(link);
               await nav(link);
