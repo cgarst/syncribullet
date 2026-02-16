@@ -74,6 +74,14 @@ export const manifestCatalogItems = [
     ],
   },
   {
+    id: 'syncribullet-mdblist-shows-upnext',
+    type: ManifestReceiverTypes.SERIES,
+    name: 'MDBList - Up Next',
+    extra: [
+      { name: ManifestCatalogExtraParameters.SKIP, isRequired: false },
+    ],
+  },
+  {
     id: 'syncribullet-mdblist-shows-dropped',
     type: ManifestReceiverTypes.SERIES,
     name: 'MDBList - Dropped',
@@ -91,6 +99,7 @@ export const defaultCatalogs: Readonly<
   'syncribullet-mdblist-movies-history',
   'syncribullet-mdblist-shows-watchlist',
   'syncribullet-mdblist-shows-history',
+  'syncribullet-mdblist-shows-upnext',
 ] as const satisfies Readonly<(typeof manifestCatalogItems)[number]['id'][]>;
 
 // Import sync is disabled (importSync: false), so no import catalog mappings needed

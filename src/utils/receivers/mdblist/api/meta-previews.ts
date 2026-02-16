@@ -70,6 +70,37 @@ interface MDBListDroppedItem {
   };
 }
 
+interface MDBListUpNextItem {
+  show: {
+    ids: {
+      mdblist?: string;
+      tmdb?: number;
+      imdb?: string;
+      tvdb?: number;
+      trakt?: number;
+    };
+    title: string;
+    year: number;
+    poster?: string;
+  };
+  next_episode: {
+    ids: {
+      tmdb?: number;
+    };
+    season: number;
+    episode: number;
+    title: string;
+    air_date: string;
+    runtime: number;
+    still?: string;
+  };
+  progress: {
+    watched_episode_count: number;
+    total_episode_count: number;
+  };
+  last_watched_at: string;
+}
+
 export interface MDBListLibrary {
   movies: MDBListWatchlistItem[];
   shows: MDBListWatchlistItem[];
@@ -182,6 +213,30 @@ export async function getMDBListMetaPreviews(
             description: (item.show as any)?.description,
             genres: (item.show as any)?.genres,
             ratings: (item.show as any)?.ratings,
+          })),
+        });
+        break;
+
+      case MDBListCatalogStatus.UPNEXT:
+        // Up Next endpoint - in-progress shows with next unwatched episodes
+        url = `https://api.mdblist.com/upnext?apikey=${userConfig.auth.apikey}&limit=100`;
+        responseTransform = (data) => ({
+          movies: [],
+          shows: (data.items || []).map((item: MDBListUpNextItem) => ({
+            id: 0,
+            adult: 0,
+            title: item.show.title,
+            imdb_id: item.show.ids.imdb || '',
+            tvdb_id: item.show.ids.tvdb || null,
+            language: 'en',
+            mediatype: 'show' as const,
+            release_year: item.show.year,
+            watchlist_at: item.last_watched_at,
+            spoken_language: 'en',
+            country: 'us',
+            rank: 0,
+            // Poster from MDBList API
+            poster: item.show.poster,
           })),
         });
         break;
