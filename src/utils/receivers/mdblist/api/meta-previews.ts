@@ -117,6 +117,45 @@ export interface MDBListDroppedLibrary {
   shows: MDBListDroppedItem[];
 }
 
+/**
+ * Fetch full media info by MDBList ID to get all IDs (IMDB, TMDB, TVDB, etc.)
+ * Used to enrich Up Next items that only have MDBList IDs
+ */
+async function getMDBListMediaInfo(
+  mdblistId: string,
+  mediaType: 'movie' | 'show',
+  apikey: string,
+): Promise<{
+  imdb?: string;
+  tmdb?: number;
+  tvdb?: number;
+  trakt?: number;
+} | null> {
+  try {
+    const url = `https://api.mdblist.com/mdblist/${mediaType}/${mdblistId}?apikey=${apikey}`;
+    const response = await axiosCache(url, {
+      id: `mdblist-media-info-${mdblistId}`,
+      method: 'GET',
+      cache: {
+        ttl: 1000 * 60 * 20, // 20 minutes (same as catalog cache)
+        interpretHeader: false,
+        staleIfError: 60 * 60 * 5, // 5 hours
+      },
+    });
+
+    const data = await response.data;
+    return {
+      imdb: data.ids?.imdb,
+      tmdb: data.ids?.tmdb,
+      tvdb: data.ids?.tvdb,
+      trakt: data.ids?.trakt,
+    };
+  } catch (e) {
+    console.error(`Failed to fetch MDBList media info for ${mdblistId}:`, e);
+    return null;
+  }
+}
+
 export async function getMDBListMetaPreviews(
   type: MDBListCatalogType,
   status: MDBListCatalogStatus,
@@ -222,7 +261,8 @@ export async function getMDBListMetaPreviews(
 
       case MDBListCatalogStatus.UPNEXT:
         // Up Next endpoint - in-progress shows with next unwatched episodes
-        // Note: This endpoint only returns TMDB and MDBList IDs (no IMDB IDs)
+        // Note: This endpoint only returns TMDB and MDBList IDs
+        // IMDB IDs are enriched via MDBList media info API after initial fetch
         url = `https://api.mdblist.com/upnext?apikey=${userConfig.auth.apikey}&limit=100`;
         responseTransform = (data) => ({
           movies: [],
@@ -262,6 +302,31 @@ export async function getMDBListMetaPreviews(
     });
 
     const transformedData = responseTransform(await response.data);
+
+    // Enrich Up Next items with IMDB IDs via MDBList media info endpoint
+    if (status === MDBListCatalogStatus.UPNEXT && userConfig.auth) {
+      const enrichmentPromises = transformedData.shows.map(async (show) => {
+        // Only enrich if we have MDBList ID but no IMDB ID
+        if (show.mdblist_id && !show.imdb_id && userConfig.auth) {
+          const mediaInfo = await getMDBListMediaInfo(
+            show.mdblist_id,
+            'show',
+            userConfig.auth.apikey,
+          );
+
+          if (mediaInfo) {
+            // Update with all available IDs from media info
+            if (mediaInfo.imdb) show.imdb_id = mediaInfo.imdb;
+            if (mediaInfo.tvdb) show.tvdb_id = mediaInfo.tvdb;
+            if (mediaInfo.tmdb) show.tmdb_id = mediaInfo.tmdb;
+          }
+        }
+        return show;
+      });
+
+      // Wait for all enrichment to complete
+      transformedData.shows = await Promise.all(enrichmentPromises);
+    }
 
     // Filter by type if specified
     if (type === MDBListCatalogType.MOVIES) {

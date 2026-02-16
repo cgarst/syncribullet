@@ -182,7 +182,7 @@ export class MDBListServerReceiver extends ReceiverServer<MDBListMCIT> {
         };
       }
     }
-    // Note: TMDB-only items (like Up Next) will use MDBList data without Cinemeta enrichment
+    // Note: Items without IMDB IDs (fallback) will use MDBList data without Cinemeta enrichment
 
     if (!meta) {
       throw new Error('No meta found!');
