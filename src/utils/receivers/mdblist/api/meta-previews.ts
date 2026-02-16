@@ -124,9 +124,10 @@ export async function getMDBListMetaPreviews(
     throw new Error('No user config! This should not happen!');
   }
 
+  let url = '';
+
   try {
     // Map catalog status to API endpoint
-    let url: string;
     let responseTransform: (data: any) => MDBListLibrary;
 
     switch (status) {
@@ -272,7 +273,14 @@ export async function getMDBListMetaPreviews(
 
     return transformedData;
   } catch (e) {
-    console.error('Failed to fetch MDBList catalog data:', e);
+    console.error('Failed to fetch MDBList catalog data:', {
+      type,
+      status,
+      url,
+      error: e,
+      message: e instanceof Error ? e.message : String(e),
+      stack: e instanceof Error ? e.stack : undefined,
+    });
     return {
       movies: [],
       shows: [],
